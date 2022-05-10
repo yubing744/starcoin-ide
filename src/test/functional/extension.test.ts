@@ -38,10 +38,11 @@ suite("Starcoin-IDE.functional.test", () => {
             let mpm = loader.executatePath
             let output = cp.spawnSync(mpm, ['package', 'test'], {
                 encoding: 'utf-8',
+                stdio: 'pipe',
                 cwd: path.resolve(__dirname, './demos/simple-nft-mpm')
             });
 
-            console.log("output: ", output.stdout)
+            console.log("output: ", output.stdout.toString())
         });
 
         /*
