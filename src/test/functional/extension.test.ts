@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as fse from 'fs-extra';
+import * as cp from 'child_process';
 
 import { sleep, getTaskResult } from './utils'
 import { Downloader, currentDownloader } from '../../downloader';
@@ -33,8 +34,18 @@ suite("Starcoin-IDE.functional.test", () => {
 
             let {tag} = await loader.checkRelease(loader.latestVersion);
             assert.strictEqual(version, tag)
+
+            let mpm = loader.executatePath
+            let output = cp.spawnSync(mpm, ['package', 'test'], {
+                encoding: 'utf-8',
+                stdio: 'inherit',
+                cwd: path.resolve(__dirname, './demos/simple-nft-mpm')
+            });
+
+            console.log("output: ", output)
         });
 
+        /*
         test("Upgrade should be ok", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
             assert.ok(ext)
@@ -61,8 +72,10 @@ suite("Starcoin-IDE.functional.test", () => {
             const newVersion = fse.readFileSync(loader.versionPath, {encoding: "utf-8"})
             assert.strictEqual(newVersion, version.tag)
         });
+        */
     });
    
+    /*
     suite("Move commands test", () => {
         test("test starcoin clean commands", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
@@ -217,4 +230,5 @@ suite("Starcoin-IDE.functional.test", () => {
             }
         });
     });
+    */
 });
