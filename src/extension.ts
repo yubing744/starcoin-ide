@@ -374,11 +374,16 @@ function mpmExecute(task: string, command: string, fileMarker: Marker): Thenable
         }
     }
 
+    let cmd = [bin, command, path, commonArgs.join(' ')].join(' ')
+
+    console.log("workdir:", workdir)
+    console.log("cmd:", cmd)
+
     return tasks.executeTask(new Task(
         {task, type: NAMESPACE},
         workdir,
         task,
         NAMESPACE,
-        new ShellExecution([bin, command, path, commonArgs.join(' ')].join(' '), opts)
+        new ShellExecution(cmd, opts)
     ));
 }

@@ -22,7 +22,7 @@ suite("Starcoin-IDE.functional.test", () => {
             assert.ok(ext)
 
             const loader:Downloader = currentDownloader(ext.extensionPath);
-            fse.emptyDirSync(loader.binPath(""))
+            //fse.emptyDirSync(loader.binPath(""))
 
             // activate extension trigger install lastest move binary
             await ext.activate();
@@ -36,7 +36,7 @@ suite("Starcoin-IDE.functional.test", () => {
             assert.strictEqual(version, tag)
 
             let mpm = loader.executatePath
-            let output = cp.spawnSync(mpm, ['package', 'test'], {
+            let output = cp.spawnSync(mpm, ['package', 'test', "--path", ".", "--install-dir", "."], {
                 encoding: 'utf-8',
                 stdio: 'pipe',
                 cwd: path.resolve(__dirname, './demos/simple-nft-mpm')
