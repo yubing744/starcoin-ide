@@ -38,11 +38,10 @@ suite("Starcoin-IDE.functional.test", () => {
             let mpm = loader.executatePath
             let output = cp.spawnSync(mpm, ['package', 'test'], {
                 encoding: 'utf-8',
-                stdio: 'inherit',
                 cwd: path.resolve(__dirname, './demos/simple-nft-mpm')
             });
 
-            console.log("output: ", output)
+            console.log("output: ", output.stdout)
         });
 
         /*
@@ -75,8 +74,9 @@ suite("Starcoin-IDE.functional.test", () => {
         */
     });
    
-    /*
+  
     suite("Move commands test", () => {
+        /*
         test("test starcoin clean commands", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
             assert.ok(ext)
@@ -141,7 +141,7 @@ suite("Starcoin-IDE.functional.test", () => {
                 assert.fail("Error in test command, error: " + err)
             }
         });
-
+        */
 
         test("test starcoin unit test commands", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
@@ -172,6 +172,7 @@ suite("Starcoin-IDE.functional.test", () => {
             }
         });
 
+        /*
         test("test starcoin mpm publish commands", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
             assert.ok(ext)
@@ -229,6 +230,7 @@ suite("Starcoin-IDE.functional.test", () => {
                 assert.fail("Error in test command, error: " + err)
             }
         });
+        */
     });
-    */
+
 });
