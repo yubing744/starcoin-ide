@@ -3,6 +3,7 @@
  * 
  * @copyright 2021 StarCoin
  */
+import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as Path from 'path';
@@ -363,10 +364,14 @@ function mpmExecute(task: string, command: string, fileMarker: Marker): Thenable
     }
     
     let homeDir = process.env.HOME
-    if (process.platform === 'win32') {
-        homeDir = process.env.HOMEPATH
+    if (process.platform === 'win32' && !homeDir) {
+        homeDir = process.env.USERPROFILE
     }
 
+    if (!homeDir) {
+        homeDir = os.tmpdir()
+    }
+    
     // @ts-ignore
     const opts: ShellExecutionOptions = {
         env: {
@@ -374,16 +379,13 @@ function mpmExecute(task: string, command: string, fileMarker: Marker): Thenable
         }
     }
 
-    let cmd = [bin, command, path, commonArgs.join(' ')].join(' ')
-
-    console.log("workdir:", workdir)
-    console.log("cmd:", cmd)
+    console.log("command: ", command, ",homeDir: ", homeDir, ",path: ", path)
 
     return tasks.executeTask(new Task(
         {task, type: NAMESPACE},
         workdir,
         task,
         NAMESPACE,
-        new ShellExecution(cmd, opts)
+        new ShellExecution([bin, command, path, commonArgs.join(' ')].join(' '), opts)
     ));
 }

@@ -10,6 +10,7 @@ import * as assert from 'assert';
 import * as path from 'path';
 import * as fse from 'fs-extra';
 import * as cp from 'child_process';
+import * as os from 'os';
 
 import { sleep, getTaskResult } from './utils'
 import { Downloader, currentDownloader } from '../../downloader';
@@ -36,13 +37,29 @@ suite("Starcoin-IDE.functional.test", () => {
             assert.strictEqual(version, tag)
 
             let mpm = loader.executatePath
-            let output = cp.spawnSync(mpm, ['package', 'test', "--path", ".", "--install-dir", "."], {
+
+            let homeDir = process.env.HOME
+            if (process.platform === 'win32' && !homeDir) {
+                homeDir = process.env.USERPROFILE
+            }
+
+            if (!homeDir) {
+                homeDir = os.tmpdir()
+            }
+
+            console.log("command: ", "integration-test", ",homeDir: ", homeDir)
+
+            let output = cp.spawnSync(mpm, ['integration-test', "--path", ".", "--install-dir", "."], {
                 encoding: 'utf-8',
                 stdio: 'pipe',
-                cwd: path.resolve(__dirname, './demos/simple-nft-mpm')
+                cwd: path.resolve(__dirname, './demos/simple-nft-mpm'),
+                env: {
+                    "HOME": homeDir,
+                }
             });
 
-            console.log("output: ", output.stdout.toString())
+            console.log("stdout output: ", output.stdout.toString())
+            console.log("stderr output: ", output.stderr.toString())
         });
 
         /*
@@ -144,7 +161,7 @@ suite("Starcoin-IDE.functional.test", () => {
         });
         */
 
-        test("test starcoin unit test commands", async () => {
+        test("test starcoin functional test commands", async () => {
             const ext = vscode.extensions.getExtension("starcoinorg.starcoin-ide");
             assert.ok(ext)
             
@@ -163,8 +180,8 @@ suite("Starcoin-IDE.functional.test", () => {
                 await vscode.window.showTextDocument(docs);
                 await sleep(1000)
 
-                // 3. execute testUnit command
-                let exec:vscode.TaskExecution = await vscode.commands.executeCommand("starcoin.testUnit");
+                // 3. execute command
+                let exec:vscode.TaskExecution = await vscode.commands.executeCommand("starcoin.testFunctional");
                 let exitCode = await getTaskResult(exec)
                 await sleep(1000)
                 assert.strictEqual(0, exitCode)
