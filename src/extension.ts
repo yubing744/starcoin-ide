@@ -363,6 +363,12 @@ function mpmExecute(task: string, command: string, fileMarker: Marker): Thenable
         case Marker.SrcDir: path = Path.join(dir, 'sources'); break;
     }
     
+    // Fix file format in windows
+    if (process.platform === 'win32') {
+        let sourceDir = Path.join(dir, 'integration-tests')
+        dos2unix(sourceDir, "**/*.exp")
+    }
+
     let homeDir = process.env.HOME
     if (process.platform === 'win32' && !homeDir) {
         homeDir = process.env.USERPROFILE
