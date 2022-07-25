@@ -67,6 +67,19 @@ interface CommandExecutionOptions {
   env?: { [key: string]: string };
 }
 
+function getProjectFolder(docUri: vscode.Uri): string | undefined {
+  let currentPath = docUri.fsPath || '';
+
+  if (currentPath) {
+    currentPath = Path.dirname(currentPath);
+    if (currentPath.length > 0 && Path.basename(currentPath) === 'Move.toml') {
+      return currentPath;
+    }
+  }
+
+  return undefined;
+}
+
 /**
  * Main function of this extension. Runs the given mpm command as a VSCode task,
  * optionally include the current file as an argument for the binary.
@@ -105,7 +118,13 @@ function mpmExecute(
   }
 
   // Current working (project) directory to set absolute paths.
-  const dir = workdir.uri.fsPath;
+  const projectFolder = getProjectFolder(document.uri);
+  ideCtx.logger.info(`Project folder: ${projectFolder}`);
+  
+  let dir = workdir.uri.fsPath;
+  if (projectFolder && projectFolder.length > 0) {
+    dir = projectFolder;
+  }
 
   // Get binary path which is always inside `extension/bin` directory.
   const bin = Path.join(extPath, 'bin', process.platform === 'win32' ? 'mpm.exe' : 'mpm');
