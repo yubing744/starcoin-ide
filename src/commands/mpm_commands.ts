@@ -72,7 +72,9 @@ function getProjectFolder(docUri: vscode.Uri): string | undefined {
 
   if (currentPath) {
     currentPath = Path.dirname(currentPath);
-    if (currentPath.length > 0 && Path.basename(currentPath) === 'Move.toml') {
+    const projectFile = Path.join(currentPath, 'Move.toml');
+
+    if (fse.existsSync(projectFile)) {
       return currentPath;
     }
   }
@@ -118,12 +120,12 @@ function mpmExecute(
   }
 
   // Current working (project) directory to set absolute paths.
-  const projectFolder = getProjectFolder(document.uri);
+  ideCtx.logger.info(`document.uri: ${document.uri}`);
+  let projectFolder = getProjectFolder(document.uri);
   ideCtx.logger.info(`Project folder: ${projectFolder}`);
   
-  let dir = workdir.uri.fsPath;
-  if (projectFolder && projectFolder.length > 0) {
-    dir = projectFolder;
+  if (!projectFolder) {
+    projectFolder = workdir.uri.fsPath;
   }
 
   // Get binary path which is always inside `extension/bin` directory.
@@ -140,21 +142,21 @@ function mpmExecute(
       path = document.uri.fsPath.toString() || '';
       break;
     case Marker.WorkDir:
-      path = dir;
+      path = projectFolder;
       break;
     case Marker.SrcDir:
-      path = Path.join(dir, 'sources');
+      path = Path.join(projectFolder, 'sources');
       break;
   }
 
   // Fix file format in windows
   if (process.platform === 'win32') {
-    const intDir = Path.join(dir, 'integration-tests');
+    const intDir = Path.join(projectFolder, 'integration-tests');
     if (fs.existsSync(intDir)) {
       dos2unix(intDir, '**/*.exp');
     }
 
-    const specDir = Path.join(dir, 'spectests');
+    const specDir = Path.join(projectFolder, 'spectests');
     if (fs.existsSync(specDir)) {
       dos2unix(specDir, '**/*.exp');
     }
@@ -184,9 +186,7 @@ function mpmExecute(
     args = args.concat(cmdOpts.shellArgs);
   }
 
-  if (cmdOpts?.cwd) {
-    opts.cwd = cmdOpts.cwd;
-  }
+  opts.cwd = projectFolder;
 
   if (cmdOpts?.env) {
     opts.env = {

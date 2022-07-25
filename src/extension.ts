@@ -31,6 +31,8 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
     deactivate
   };
 
+  ideCtx.logger.info('Activating StarCoin IDE Extension');
+  
   const registerCommand = commands.createRegisterCommand(ideCtx);
 
   registerCommand('starcoin.reloadExtension', commands.reloadExtension);
